@@ -45,7 +45,7 @@ const Login = () => {
             // token 
 
             localStorage.setItem("token",apiResponse.token)
-            navigate('/all-user')
+            navigate('/')
             // console.log("apiResponse.response.token",apiResponse.token)
 
 

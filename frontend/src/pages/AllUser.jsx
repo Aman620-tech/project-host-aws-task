@@ -31,12 +31,6 @@ const AllUser = () => {
 
   console.log("user", user)
 
-  const Logout = () => {
-    console.log("Hello duniya")
-    localStorage.clear()
-    navigate('/login')
-
-  }
 
 
 
@@ -44,7 +38,6 @@ const AllUser = () => {
     <div>
 
       <div class="table-responsive">
-        <Button onClick={Logout}>Logout</Button>
         <table class="table table-primary">
           <thead>
             <tr>

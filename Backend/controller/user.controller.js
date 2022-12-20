@@ -9,35 +9,37 @@ let viewFunction = (req, res) => {
   res.send({ status: 200, response: "controller file access" });
 };
 
-let userRegister = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.json({ status: 400, response: "All attributes required" });
-    }
+// let userRegister = async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+//     if (!name || !email || !password) {
+//       return res.json({ status: 400, response: "All attributes required" });
+//     }
 
-    const salt = await bcrypt.genSalt(8);
+//     const salt = await bcrypt.genSalt(8);
 
-    const passwordHash = await bcrypt.hash(password, salt);
+//     const passwordHash = await bcrypt.hash(password, salt);
 
-    const userData = {
-      id: uuid.v4(),
-      name,
-      email,
-      password: passwordHash,
-      role: "user",
-    };
-    const sqlQuery = "INSERT INTO user SET ?";
-    await connectDb.query(sqlQuery, userData, (err, result) => {
-      if (err) {
-        return res.json({ status: 400, response: err.sqlMessage });
-      }
-      res.json({ status: 200, response: "User Created Successfully", result });
-    });
-  } catch (err) {
-    res.json({ status: 400, response: err.message });
-  }
-};
+//     const userData = {
+//       id: uuid.v4(),
+//       name,
+//       email,
+//       password: passwordHash,
+//       role: "user",
+//     };
+//     const sqlQuery = "INSERT INTO user SET ?";
+//     await connectDb.query(sqlQuery, userData, async(err, result) => {
+//       if (err) {
+//         return res.json({ status: 400, response: err.sqlMessage });
+//       }
+//       const token = await tokenCreate(result[0].id);
+
+//       res.json({ status: 200, response: "User Created Successfully", result ,token});
+//     });
+//   } catch (err) {
+//     res.json({ status: 400, response: err.message });
+//   }
+// };
 
 let adminRegister = async (req, res) => {
   try {
@@ -56,11 +58,26 @@ let adminRegister = async (req, res) => {
       role: "admin",
     };
     const sqlQuery = "INSERT INTO user SET ?";
-    await connectDb.query(sqlQuery, userData, (err, result) => {
+    await connectDb.query(sqlQuery, userData, async (err, res1) => {
       if (err) {
         return res.json({ Error: err.sqlMessage });
       }
-      res.json({ status: 200, response: "User Created Successfully", result });
+      await connectDb.query(
+        "select * from user where email= ?",
+        email,
+        async (err, result) => {
+          if (err) {
+            return res.json({ Error: err.sqlMessage });
+          }
+          const token = await tokenCreate(result[0].id);
+          res.json({
+            status: 200,
+            response: "User Created Successfully",
+            result,
+            token,
+          });
+        }
+      );
     });
   } catch (err) {
     res.json({ status: 400, response: err.message });
@@ -86,6 +103,10 @@ let login = async (req, res) => {
     await connectDb.query(sqlQuery, email, async (err, result) => {
       if (err) {
         return res.json({ status: 400, response: err.sqlMessage });
+      }
+      console.log("result", result[0]);
+      if (result[0] === undefined) {
+        return res.json({ status: 400, response: "no user found" });
       }
       const dbPassword = await result[0].password;
       const passwordCheck = await bcrypt.compare(password, dbPassword);
@@ -126,4 +147,10 @@ let allUser = async (req, res) => {
   }
 };
 
-module.exports = { viewFunction, userRegister, adminRegister, login, allUser };
+module.exports = {
+  viewFunction,
+  // userRegister,
+  adminRegister,
+  login,
+  allUser,
+};

@@ -2,7 +2,7 @@ const express = require("express");
 const routes = express.Router();
 const {
   viewFunction,
-  userRegister,
+  // userRegister,
   adminRegister,
   login,
   allUser,
@@ -13,7 +13,7 @@ const {adminCheck,userCheck} = require('../middleware/auth')
 
 routes.get("/view", viewFunction);
 // routes.get("/view-user",userCheck, viewFunction);
-routes.post("/register", userRegister);
+// routes.post("/register", userRegister);
 routes.post("/admin-register", adminRegister);
 routes.post("/login", login);
 

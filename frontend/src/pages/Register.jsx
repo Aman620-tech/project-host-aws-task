@@ -3,12 +3,13 @@ import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 // hooks
 
 
 const Register = () => {
-
+    const navigate = useNavigate()
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -35,14 +36,16 @@ const Register = () => {
             body: JSON.stringify(userData)
         }
 
-        const api = await fetch('http://localhost:3001/user/register', apiData)
+        const api = await fetch('http://localhost:3001/user/admin-register', apiData)
         const response = await api.json()
         console.log("response", response)
-        
-        if(response.status === 200){
+
+        if (response.status === 200) {
             window.alert(response.response)
+            localStorage.setItem("token")
+            navigate('/')
         }
-        if(response.status === 400){
+        if (response.status === 400) {
             window.alert(response.response)
         }
 
